@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ripgrep GUI Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- 顶部搜索栏 -->
+        <div class="search-panel">
+            <div class="row">
+                <input type="text" id="query" placeholder="输入搜索内容..." class="main-input">
+                <button id="search-btn" class="primary-btn">搜 索</button>
+            </div>
+            
+            <div class="row config-row">
+                <div class="input-group">
+                    <label>目录:</label>
+                    <input type="text" id="path-input" placeholder="选择目录..." readonly>
+                    <button id="browse-btn" class="secondary-btn">📂</button>
+                </div>
+                
+                <div class="input-group">
+                    <label>类型 (例如: py,js,html):</label>
+                    <input type="text" id="extensions" placeholder="留空搜所有">
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="case-sensitive">
+                    <label for="case-sensitive">区分大小写</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态栏 -->
+        <div id="status-bar" class="status-bar">准备就绪</div>
+
+        <!-- 结果展示区 -->
+        <div id="results-area" class="results-area">
+            <!-- 搜索结果将注入到这里 -->
+            <div class="empty-state">在上方输入内容开始极速检索</div>
+        </div>
+    </div>
+
+    <!-- 引入 Eel 的 JS -->
+    <script type="text/javascript" src="/eel.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
