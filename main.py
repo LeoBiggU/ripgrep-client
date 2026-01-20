@@ -18,14 +18,23 @@ def select_folder():
     return folder_path
 
 @eel.expose
-def open_in_vscode(file_path, line_num):
+def open_in_vscode(file_path, line_num, root_path=None):
     """
-    调用 VS Code 打开指定文件并跳转到行号
-    需要确保 'code' 命令在系统环境变量中
+    调用 VS Code 打开指定文件
+    root_path: 如果提供，会先打开该目录作为工作区，再定位文件
     """
     try:
-        # -g 选项允许格式为 file:line
-        cmd = ["code", "-g", f"{file_path}:{line_num}"]
+        # 构建命令列表
+        cmd = ["code"]
+        
+        # 如果需要在目录上下文中打开
+        if root_path:
+            cmd.append(root_path)
+            
+        # 定位文件和行号
+        # 注意：当同时打开文件夹和文件时，VS Code 支持这种写法： code folder_path -g file_path:line
+        cmd.append("-g")
+        cmd.append(f"{file_path}:{line_num}")
         
         # 隐藏控制台窗口 (Windows)
         startupinfo = None
@@ -33,6 +42,7 @@ def open_in_vscode(file_path, line_num):
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             
+        # shell=True 在某些环境下能更好地找到 code 命令
         subprocess.Popen(cmd, startupinfo=startupinfo, shell=True)
         return True
     except Exception as e:
@@ -110,7 +120,6 @@ def run_ripgrep(query, path, extensions, case_sensitive):
         stdout, stderr = process.communicate()
 
         results = []
-        # 获取搜索根目录的绝对路径，用于拼接完整路径
         abs_search_root = os.path.abspath(path)
 
         for line in stdout.splitlines():
@@ -121,13 +130,12 @@ def run_ripgrep(query, path, extensions, case_sensitive):
                     raw_text = data['lines']['text'].rstrip('\r\n')
                     formatted_html = highlight_text(raw_text, data['submatches'])
                     
-                    # 拼接绝对路径
                     rel_path = data['path']['text']
                     full_path = os.path.join(abs_search_root, rel_path)
 
                     results.append({
-                        'file': rel_path,      # 展示用的相对路径
-                        'full_path': full_path,# 打开用的绝对路径
+                        'file': rel_path,
+                        'full_path': full_path,
                         'line_num': data['line_number'],
                         'content_html': formatted_html
                     })
@@ -145,8 +153,7 @@ def run_ripgrep(query, path, extensions, case_sensitive):
     except Exception as e:
         return {"error": str(e)}
 
-# 启动
 try:
-    eel.start('index.html', mode='edge', size=(1400, 800))
+    eel.start('index.html', mode='edge', size=(1000, 800))
 except EnvironmentError:
     eel.start('index.html', mode='default')

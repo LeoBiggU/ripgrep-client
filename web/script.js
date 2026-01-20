@@ -15,6 +15,7 @@ async function performSearch() {
     const path = document.getElementById('path-input').value;
     const extensions = document.getElementById('extensions').value;
     const caseSensitive = document.getElementById('case-sensitive').checked;
+    
     const resultArea = document.getElementById('results-area');
     const statusBar = document.getElementById('status-bar-text');
 
@@ -27,10 +28,9 @@ async function performSearch() {
     resultArea.innerHTML = '<div class="empty-state">正在拼命检索中...</div>';
     document.getElementById('search-btn').disabled = true;
 
-    // --- 1. 计时开始 ---
+    // 计时开始
     const startTime = performance.now();
 
-    // 调用 Python
     const response = await eel.run_ripgrep(query, path, extensions, caseSensitive)();
 
     document.getElementById('search-btn').disabled = false;
@@ -41,23 +41,20 @@ async function performSearch() {
         return;
     }
 
-    // 渲染结果
-    renderResults(response.data, response.count);
+    // 渲染结果 (注意：这里多传了一个 path 参数，用于后续打开目录)
+    renderResults(response.data, response.count, path);
 
-    // --- 2. 计时结束 ---
+    // 计时结束
     const endTime = performance.now();
-    
-    // 计算耗时 (毫秒转秒，保留3位小数)
     const duration = ((endTime - startTime) / 1000).toFixed(3);
 
-    // --- 3. 更新状态栏显示时间 ---
     if (response.count > 0) {
-        // 覆盖 renderResults 里设置的文字，加上时间
         statusBar.innerText = `完成: 找到 ${response.count} 个匹配项 (耗时 ${duration} 秒)`;
     }
 }
 
-function renderResults(groupedData, count) {
+// 接收 rootPath 参数
+function renderResults(groupedData, count, rootPath) {
     const resultArea = document.getElementById('results-area');
     const statusBar = document.getElementById('status-bar-text');
     
@@ -67,7 +64,6 @@ function renderResults(groupedData, count) {
         return;
     }
 
-    // 先设置一个基础文本，稍后会在 performSearch 里被覆盖加上时间
     statusBar.innerText = `完成: 找到 ${count} 个匹配项`;
     resultArea.innerHTML = '';
 
@@ -87,7 +83,7 @@ function renderResults(groupedData, count) {
             
             lineDiv.innerHTML = `<span class="line-num">${match.line_num}</span><span>${match.content_html}</span>`;
             
-            // 左键单击：划掉/恢复
+            // 左键单击：划掉
             lineDiv.addEventListener('click', () => {
                 lineDiv.classList.toggle('checked');
             });
@@ -95,7 +91,14 @@ function renderResults(groupedData, count) {
             // 右键单击：打开 VS Code
             lineDiv.addEventListener('contextmenu', async (e) => {
                 e.preventDefault(); 
-                await eel.open_in_vscode(match.full_path, match.line_num)();
+                
+                // 获取复选框状态
+                const useWorkspace = document.getElementById('workspace-mode').checked;
+                
+                // 如果勾选了"在目录打开"，则传入 rootPath，否则传入 null
+                const workspacePath = useWorkspace ? rootPath : null;
+
+                await eel.open_in_vscode(match.full_path, match.line_num, workspacePath)();
             });
 
             fileBlock.appendChild(lineDiv);
