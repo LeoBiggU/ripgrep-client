@@ -19,13 +19,13 @@
             <div class="row config-row">
                 <div class="input-group">
                     <label>目录:</label>
-                    <input type="text" id="path-input" placeholder="选择目录..." readonly>
+                    <input type="text" id="path-input" placeholder="选择目录..." value="D:/Codes/dev/WorkProjects/MOM/Dev/TYMesAbpProject" readonly>
                     <button id="browse-btn" class="secondary-btn">📂</button>
                 </div>
                 
                 <div class="input-group">
-                    <label>类型 (例如: py,js,html):</label>
-                    <input type="text" id="extensions" placeholder="留空搜所有">
+                    <label>类型 (如 py,js):</label>
+                    <input type="text" id="extensions" placeholder="默认所有" value="ts,cshtml,vue">
                 </div>
 
                 <div class="checkbox-group">
@@ -36,16 +36,18 @@
         </div>
 
         <!-- 状态栏 -->
-        <div id="status-bar" class="status-bar">准备就绪</div>
+        <div class="status-bar">
+            <span id="status-bar-text">准备就绪</span>
+            <!-- 修改了这里的提示文字 -->
+            <span class="hint-text">💡 左键标记，右键打开 VS Code</span>
+        </div>
 
         <!-- 结果展示区 -->
         <div id="results-area" class="results-area">
-            <!-- 搜索结果将注入到这里 -->
-            <div class="empty-state">在上方输入内容开始极速检索</div>
+            <div class="empty-state">在上方输入内容开始检索</div>
         </div>
     </div>
 
-    <!-- 引入 Eel 的 JS -->
     <script type="text/javascript" src="/eel.js"></script>
     <script src="script.js"></script>
 </body>

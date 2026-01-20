@@ -8,6 +8,8 @@
     --highlight-bg: #3c3c3c;
     --match-color: #ce9178;
     --file-color: #9cdcfe;
+    /* 新增：已检查项目的颜色 */
+    --checked-color: #666;
 }
 
 body {
@@ -29,7 +31,6 @@ body {
     box-sizing: border-box;
 }
 
-/* 搜索面板 */
 .search-panel {
     background-color: var(--panel-bg);
     padding: 15px;
@@ -38,19 +39,9 @@ body {
     margin-bottom: 15px;
 }
 
-.row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.config-row { margin-bottom: 0; flex-wrap: wrap; align-items: center; }
 
-.config-row {
-    margin-bottom: 0;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-/* 输入框和按钮 */
 input[type="text"] {
     background-color: #3c3c3c;
     border: 1px solid var(--border-color);
@@ -59,15 +50,8 @@ input[type="text"] {
     border-radius: 4px;
     outline: none;
 }
-
-input[type="text"]:focus {
-    border-color: var(--accent-color);
-}
-
-.main-input {
-    flex: 1;
-    font-size: 1.1em;
-}
+input[type="text"]:focus { border-color: var(--accent-color); }
+.main-input { flex: 1; font-size: 1.1em; }
 
 .primary-btn {
     background-color: var(--accent-color);
@@ -78,7 +62,6 @@ input[type="text"]:focus {
     cursor: pointer;
     font-weight: bold;
 }
-
 .primary-btn:hover { background-color: var(--accent-hover); }
 
 .secondary-btn {
@@ -90,14 +73,10 @@ input[type="text"]:focus {
     border-radius: 4px;
 }
 
-.input-group {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+.input-group { display: flex; align-items: center; gap: 5px; }
 .input-group label { font-size: 0.9em; color: #aaa; }
+.checkbox-group { display: flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer; }
 
-/* 结果区域 */
 .results-area {
     flex: 1;
     overflow-y: auto;
@@ -112,9 +91,10 @@ input[type="text"]:focus {
     color: #888;
     margin-bottom: 5px;
     margin-left: 5px;
+    display: flex;
+    justify-content: space-between;
 }
 
-/* 结果卡片 */
 .file-block {
     margin-bottom: 15px;
     border-bottom: 1px solid var(--border-color);
@@ -125,24 +105,39 @@ input[type="text"]:focus {
     color: var(--file-color);
     font-weight: bold;
     font-family: monospace;
-    padding: 5px;
-    cursor: pointer;
+    padding: 5px 10px;
     background-color: #333;
     border-radius: 4px;
     margin-bottom: 5px;
+    font-size: 0.95em;
 }
 
 .match-line {
     font-family: 'Consolas', monospace;
     font-size: 0.9em;
-    padding: 2px 5px 2px 20px;
+    padding: 4px 5px 4px 20px;
     color: #ccc;
     white-space: pre-wrap;
     display: flex;
+    cursor: pointer; /* 鼠标变手型 */
+    transition: all 0.1s;
+    user-select: none; /* 防止双击时选中文字 */
 }
 
 .match-line:hover {
     background-color: var(--highlight-bg);
+}
+
+/* 新增：被标记划掉的样式 */
+.match-line.checked {
+    text-decoration: line-through;
+    opacity: 0.5;
+    background-color: #2a2a2a;
+    color: var(--checked-color);
+}
+.match-line.checked .highlight {
+    background-color: #444; /* 让高亮也变暗 */
+    box-shadow: none;
 }
 
 .line-num {
@@ -150,7 +145,8 @@ input[type="text"]:focus {
     margin-right: 15px;
     min-width: 30px;
     text-align: right;
-    user-select: none;
+    border-right: 1px solid #444;
+    padding-right: 10px;
 }
 
 .empty-state {
@@ -159,10 +155,16 @@ input[type="text"]:focus {
     margin-top: 50px;
 }
 
-/* 高亮样式 */
 .highlight {
-    background-color: #6c5416; /* 类似 VS Code 的高亮背景色 */
+    background-color: #6c5416;
     color: white;
     border-radius: 2px;
-    box-shadow: 0 0 0 1px #a37f22; /* 微边框 */
+    box-shadow: 0 0 0 1px #a37f22;
+}
+
+/* 提示文本 */
+.hint-text {
+    font-size: 0.85em;
+    color: #666;
+    font-style: italic;
 }
