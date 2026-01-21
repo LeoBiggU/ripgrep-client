@@ -1,14 +1,12 @@
 :root {
     --bg-color: #1e1e1e;
     --panel-bg: #252526;
-    --text-color: #d4d4d4;
+    --text-color: #cccccc;
     --accent-color: #007acc;
     --accent-hover: #0062a3;
     --border-color: #3e3e42;
-    --highlight-bg: #3c3c3c;
-    --match-color: #ce9178;
-    --file-color: #9cdcfe;
-    /* 新增：已检查项目的颜色 */
+    --highlight-bg: #37373d;
+    --tree-hover: #2a2d2e;
     --checked-color: #666;
 }
 
@@ -19,63 +17,167 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-    display: flex;
-    flex-direction: column;
+    overflow: hidden;
 }
 
-.container {
+.main-layout {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    padding: 10px; /* 给整体加个内边距，让卡片不贴边 */
+    box-sizing: border-box;
+    gap: 10px; /* 左右卡片之间的间距 */
+}
+
+/* --- 左侧侧边栏 --- */
+.sidebar {
+    width: 280px;
+    min-width: 150px; /* 最小宽度 */
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    /* 移除之前的背景色，改为透明，由内部panel决定 */
+    flex-shrink: 0; 
+}
+
+/* 侧边栏卡片样式 (圆角矩形) */
+.sidebar-panel {
+    background-color: var(--panel-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 20px;
-    box-sizing: border-box;
+    overflow: hidden; /* 防止圆角被子元素溢出遮挡 */
+}
+
+.sidebar-header {
+    padding: 10px 15px;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between; /* 标题和清除按钮两端对齐 */
+    align-items: center;
+}
+
+.sidebar-title {
+    font-size: 0.85em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #bbb;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.icon-btn:hover { background-color: #444; color: white; }
+
+.tree-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    padding: 5px 0;
+}
+
+/* --- 树节点样式优化 --- */
+.tree-node {
+    display: flex;
+    align-items: center; /* 垂直居中核心 */
+    padding: 4px 0;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    user-select: none;
+    color: #cccccc;
+    height: 24px; /* 固定行高，保证整齐 */
+}
+
+.tree-node:hover { background-color: var(--tree-hover); }
+.tree-node.selected-highlight { background-color: var(--highlight-bg); color: white; }
+
+/* 固定宽度的组件，保证对齐 */
+.tree-toggle {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px; /* 固定宽度 */
+    height: 100%;
+    font-size: 10px;
+    color: #999;
+    flex-shrink: 0;
+    transition: transform 0.1s;
+}
+.tree-toggle.expanded { transform: rotate(90deg); }
+.tree-toggle.invisible { visibility: hidden; }
+
+.tree-checkbox {
+    margin: 0;
+    width: 16px; /* 固定宽度区域 */
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.tree-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px; /* 固定宽度 */
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.tree-name {
+    margin-left: 4px;
+    white-space: nowrap;
+}
+
+.tree-children { display: none; }
+.tree-children.visible { display: block; }
+
+/* --- 拖拽条 --- */
+#resizer {
+    width: 5px;
+    cursor: col-resize;
+    background-color: transparent;
+    transition: background 0.2s;
+    /* 这里的 margin 是为了让 resizer 处于 sidebar 和 main-content 的间隙中 */
+    margin: 0 -5px; 
+    z-index: 10;
+}
+#resizer:hover, #resizer.active {
+    background-color: var(--accent-color);
+}
+
+
+/* --- 右侧主内容区 --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; 
+    height: 100%;
+    gap: 15px; /* 搜索栏和结果栏的间距 */
 }
 
 .search-panel {
     background-color: var(--panel-bg);
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    margin-bottom: 15px;
-}
-
-.row { display: flex; gap: 10px; margin-bottom: 10px; }
-.config-row { margin-bottom: 0; flex-wrap: wrap; align-items: center; }
-
-input[type="text"] {
-    background-color: #3c3c3c;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     border: 1px solid var(--border-color);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 4px;
-    outline: none;
+    flex-shrink: 0;
 }
-input[type="text"]:focus { border-color: var(--accent-color); }
-.main-input { flex: 1; font-size: 1.1em; }
-
-.primary-btn {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-}
-.primary-btn:hover { background-color: var(--accent-hover); }
-
-.secondary-btn {
-    background-color: #3c3c3c;
-    border: 1px solid var(--border-color);
-    color: white;
-    cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 4px;
-}
-
-.input-group { display: flex; align-items: center; gap: 5px; }
-.input-group label { font-size: 0.9em; color: #aaa; }
-.checkbox-group { display: flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer; }
 
 .results-area {
     flex: 1;
@@ -84,87 +186,32 @@ input[type="text"]:focus { border-color: var(--accent-color); }
     border-radius: 8px;
     padding: 10px;
     border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
-.status-bar {
-    font-size: 0.85em;
-    color: #888;
-    margin-bottom: 5px;
-    margin-left: 5px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.file-block {
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-}
-
-.file-header {
-    color: var(--file-color);
-    font-weight: bold;
-    font-family: monospace;
-    padding: 5px 10px;
-    background-color: #333;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    font-size: 0.95em;
-}
-
-.match-line {
-    font-family: 'Consolas', monospace;
-    font-size: 0.9em;
-    padding: 4px 5px 4px 20px;
-    color: #ccc;
-    white-space: pre-wrap;
-    display: flex;
-    cursor: pointer; /* 鼠标变手型 */
-    transition: all 0.1s;
-    user-select: none; /* 防止双击时选中文字 */
-}
-
-.match-line:hover {
-    background-color: var(--highlight-bg);
-}
-
-/* 新增：被标记划掉的样式 */
-.match-line.checked {
-    text-decoration: line-through;
-    opacity: 0.5;
-    background-color: #2a2a2a;
-    color: var(--checked-color);
-}
-.match-line.checked .highlight {
-    background-color: #444; /* 让高亮也变暗 */
-    box-shadow: none;
-}
-
-.line-num {
-    color: #858585;
-    margin-right: 15px;
-    min-width: 30px;
-    text-align: right;
-    border-right: 1px solid #444;
-    padding-right: 10px;
-}
-
-.empty-state {
-    text-align: center;
-    color: #666;
-    margin-top: 50px;
-}
-
-.highlight {
-    background-color: #6c5416;
-    color: white;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px #a37f22;
-}
-
-/* 提示文本 */
-.hint-text {
-    font-size: 0.85em;
-    color: #666;
-    font-style: italic;
-}
+/* 其他基础组件样式保持不变... */
+.row { display: flex; gap: 10px; margin-bottom: 10px; }
+.config-row { margin-bottom: 0; flex-wrap: wrap; align-items: center; }
+input[type="text"] { background-color: #3c3c3c; border: 1px solid var(--border-color); color: white; padding: 8px 12px; border-radius: 4px; outline: none; }
+input[type="text"]:focus { border-color: var(--accent-color); }
+.main-input { flex: 1; font-size: 1.1em; }
+.primary-btn { background-color: var(--accent-color); color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.primary-btn:hover { background-color: var(--accent-hover); }
+.primary-btn:disabled { background-color: #555; cursor: not-allowed; }
+.secondary-btn { background-color: #3c3c3c; border: 1px solid var(--border-color); color: white; cursor: pointer; padding: 5px 10px; border-radius: 4px; }
+.secondary-btn:hover { background-color: #4c4c4c; }
+.input-group { display: flex; align-items: center; gap: 5px; }
+.input-group label { font-size: 0.9em; color: #aaa; }
+.checkbox-group { display: flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer; font-size: 0.9em; }
+.advanced-area { overflow: hidden; max-height: 0; transition: max-height 0.3s ease-out; margin-top: 5px; }
+.advanced-area.open { max-height: 50px; }
+.status-bar { font-size: 0.85em; color: #888; display: flex; justify-content: space-between; padding: 0 5px; }
+.file-block { margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+.file-header { color: #9cdcfe; font-weight: bold; font-family: monospace; padding: 5px 10px; background-color: #333; border-radius: 4px; margin-bottom: 5px; font-size: 0.95em; cursor: pointer; }
+.file-header:hover { background-color: #444; }
+.match-line { font-family: 'Consolas', monospace; font-size: 0.9em; padding: 4px 5px 4px 20px; color: #ccc; white-space: pre-wrap; display: flex; cursor: pointer; transition: all 0.1s; user-select: none; }
+.match-line:hover { background-color: var(--highlight-bg); }
+.match-line.checked { text-decoration: line-through; opacity: 0.5; }
+.line-num { color: #858585; margin-right: 15px; min-width: 30px; text-align: right; border-right: 1px solid #444; padding-right: 10px; }
+.empty-state { text-align: center; color: #666; margin-top: 50px; }
+.highlight { background-color: #6c5416; color: white; border-radius: 2px; }

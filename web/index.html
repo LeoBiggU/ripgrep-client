@@ -5,75 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ripgrep GUI Search</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* 这里加一点内联样式，专门用于高级区域的过渡动画 */
-        .advanced-area {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.3s ease-out;
-            margin-top: 5px;
-        }
-        .advanced-area.open {
-            max-height: 50px; /* 足够展示一行输入框即可 */
-        }
-    </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- 顶部搜索栏 -->
-        <div class="search-panel">
-            <div class="row">
-                <input type="text" id="query" placeholder="输入搜索内容..." class="main-input">
-                <button id="search-btn" class="primary-btn">搜 索</button>
+    <div class="main-layout">
+        <!-- 左侧：文件树侧边栏 -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-panel">
+                <div class="sidebar-header">
+                    <span class="sidebar-title">资源管理器</span>
+                    <!-- 增加清除选择按钮 -->
+                    <button id="clear-tree-btn" class="icon-btn" title="清除所有选择">↺</button>
+                </div>
+                <div id="file-tree" class="tree-container">
+                    <div class="empty-state" style="margin-top:20px; font-size:0.9em;">未选择目录</div>
+                </div>
             </div>
-            
-            <div class="row config-row">
-                <div class="input-group">
-                    <label>目录:</label>
-                    <input type="text" id="path-input" placeholder="选择目录..." readonly>
-                    <button id="browse-btn" class="secondary-btn">📂</button>
+        </div>
+
+        <!-- 拖拽调整宽度的把手 -->
+        <div id="resizer"></div>
+
+        <!-- 右侧：主要内容 -->
+        <div class="main-content">
+            <!-- 顶部搜索栏 -->
+            <div class="search-panel">
+                <div class="row">
+                    <input type="text" id="query" placeholder="输入搜索内容..." class="main-input">
+                    <button id="search-btn" class="primary-btn">搜 索</button>
                 </div>
                 
-                <div class="input-group">
-                    <label>类型:</label>
-                    <input type="text" id="extensions" placeholder="如 py,js" style="width: 100px;">
+                <div class="row config-row">
+                    <div class="input-group">
+                        <label>目录:</label>
+                        <input type="text" id="path-input" placeholder="选择目录..." readonly style="width: 200px;">
+                        <button id="browse-btn" class="secondary-btn">📂</button>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>类型:</label>
+                        <input type="text" id="extensions" placeholder="py,js" style="width: 50px;">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="case-sensitive">
+                        <label for="case-sensitive">Aa</label>
+                    </div>
+
+                    <div class="checkbox-group" style="margin-left: 10px; border-left: 1px solid #444; padding-left: 10px;">
+                        <input type="checkbox" id="workspace-mode">
+                        <label for="workspace-mode">在目录打开</label>
+                    </div>
+
+                    <button id="toggle-advanced" class="secondary-btn" style="margin-left: auto;">⚙️</button>
                 </div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="case-sensitive">
-                    <label for="case-sensitive">区分大小写</label>
-                </div>
-
-                <div class="checkbox-group" style="margin-left: 10px; border-left: 1px solid #444; padding-left: 10px;">
-                    <input type="checkbox" id="workspace-mode">
-                    <label for="workspace-mode">在目录打开</label>
-                </div>
-
-                <!-- 切换高级选项的按钮 -->
-                <button id="toggle-advanced" class="secondary-btn" style="margin-left: auto;">⚙️ 高级</button>
-            </div>
-
-            <!-- 高级选项区域 (默认隐藏) -->
-            <div id="advanced-area" class="advanced-area">
-                <div class="row" style="margin-bottom: 0; margin-top: 10px;">
-                    <div class="input-group" style="width: 100%;">
-                        <label style="white-space: nowrap;">自定义参数:</label>
-                        <input type="text" id="extra-args" placeholder="如: -C 3 --no-ignore --max-depth 2" style="width: 100%;">
+                <div id="advanced-area" class="advanced-area">
+                    <div class="row" style="margin-bottom: 0; margin-top: 10px;">
+                        <div class="input-group" style="width: 100%;">
+                            <label style="white-space: nowrap;">自定义参数:</label>
+                            <input type="text" id="extra-args" placeholder="如: -C 3 --no-ignore" style="width: 100%;">
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 状态栏 -->
-        <div class="status-bar">
-            <span id="status-bar-text">准备就绪</span>
-            <span class="hint-text">💡 左键标记，右键打开 VS Code</span>
-        </div>
+            <!-- 状态栏 (挪到这里显示比较好，紧凑) -->
+            <div class="status-bar">
+                <span id="status-bar-text">准备就绪</span>
+                <span class="hint-text" style="font-size:0.8em">💡 左键联动树 | 右键 VSCode</span>
+            </div>
 
-        <!-- 结果展示区 -->
-        <div id="results-area" class="results-area">
-            <div class="empty-state">在上方输入内容开始检索</div>
+            <!-- 结果展示区 -->
+            <div id="results-area" class="results-area">
+                <div class="empty-state">在上方输入内容开始检索</div>
+            </div>
         </div>
     </div>
 
