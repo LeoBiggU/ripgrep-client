@@ -5,8 +5,27 @@ document.getElementById('browse-btn').addEventListener('click', async () => {
     }
 });
 
+// 高级选项切换逻辑
+document.getElementById('toggle-advanced').addEventListener('click', () => {
+    const area = document.getElementById('advanced-area');
+    const btn = document.getElementById('toggle-advanced');
+    
+    // 切换 CSS class 实现动画
+    if (area.classList.contains('open')) {
+        area.classList.remove('open');
+        btn.style.backgroundColor = '#3c3c3c'; // 恢复默认颜色
+    } else {
+        area.classList.add('open');
+        btn.style.backgroundColor = '#444'; // 激活状态稍微亮一点
+    }
+});
+
 document.getElementById('search-btn').addEventListener('click', performSearch);
 document.getElementById('query').addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') performSearch();
+});
+// 允许在自定义参数框里回车直接搜索
+document.getElementById('extra-args').addEventListener('keyup', (e) => {
     if (e.key === 'Enter') performSearch();
 });
 
@@ -16,6 +35,9 @@ async function performSearch() {
     const extensions = document.getElementById('extensions').value;
     const caseSensitive = document.getElementById('case-sensitive').checked;
     
+    // 获取自定义参数
+    const extraArgs = document.getElementById('extra-args').value;
+
     const resultArea = document.getElementById('results-area');
     const statusBar = document.getElementById('status-bar-text');
 
@@ -28,10 +50,10 @@ async function performSearch() {
     resultArea.innerHTML = '<div class="empty-state">正在拼命检索中...</div>';
     document.getElementById('search-btn').disabled = true;
 
-    // 计时开始
     const startTime = performance.now();
 
-    const response = await eel.run_ripgrep(query, path, extensions, caseSensitive)();
+    // 传入 extraArgs
+    const response = await eel.run_ripgrep(query, path, extensions, caseSensitive, extraArgs)();
 
     document.getElementById('search-btn').disabled = false;
 
@@ -41,10 +63,8 @@ async function performSearch() {
         return;
     }
 
-    // 渲染结果 (注意：这里多传了一个 path 参数，用于后续打开目录)
     renderResults(response.data, response.count, path);
 
-    // 计时结束
     const endTime = performance.now();
     const duration = ((endTime - startTime) / 1000).toFixed(3);
 
@@ -53,7 +73,6 @@ async function performSearch() {
     }
 }
 
-// 接收 rootPath 参数
 function renderResults(groupedData, count, rootPath) {
     const resultArea = document.getElementById('results-area');
     const statusBar = document.getElementById('status-bar-text');
@@ -83,21 +102,14 @@ function renderResults(groupedData, count, rootPath) {
             
             lineDiv.innerHTML = `<span class="line-num">${match.line_num}</span><span>${match.content_html}</span>`;
             
-            // 左键单击：划掉
             lineDiv.addEventListener('click', () => {
                 lineDiv.classList.toggle('checked');
             });
 
-            // 右键单击：打开 VS Code
             lineDiv.addEventListener('contextmenu', async (e) => {
                 e.preventDefault(); 
-                
-                // 获取复选框状态
                 const useWorkspace = document.getElementById('workspace-mode').checked;
-                
-                // 如果勾选了"在目录打开"，则传入 rootPath，否则传入 null
                 const workspacePath = useWorkspace ? rootPath : null;
-
                 await eel.open_in_vscode(match.full_path, match.line_num, workspacePath)();
             });
 

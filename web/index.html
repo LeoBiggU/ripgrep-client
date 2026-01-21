@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ripgrep GUI Search</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* 这里加一点内联样式，专门用于高级区域的过渡动画 */
+        .advanced-area {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.3s ease-out;
+            margin-top: 5px;
+        }
+        .advanced-area.open {
+            max-height: 50px; /* 足够展示一行输入框即可 */
+        }
+    </style>
 </head>
 <body>
 
@@ -19,13 +31,13 @@
             <div class="row config-row">
                 <div class="input-group">
                     <label>目录:</label>
-                    <input type="text" id="path-input" placeholder="选择目录..." readonly value="D:\Codes\dev\WorkProjects\MOM\Dev\TYMesAbpProject">
+                    <input type="text" id="path-input" placeholder="选择目录..." readonly>
                     <button id="browse-btn" class="secondary-btn">📂</button>
                 </div>
                 
                 <div class="input-group">
                     <label>类型:</label>
-                    <input type="text" id="extensions" placeholder="如 py,js" style="width: 80px;" value="cshtml,ts,vue">
+                    <input type="text" id="extensions" placeholder="如 py,js" style="width: 100px;">
                 </div>
 
                 <div class="checkbox-group">
@@ -33,10 +45,22 @@
                     <label for="case-sensitive">区分大小写</label>
                 </div>
 
-                <!-- 新增：控制打开方式的复选框 -->
-                <div class="checkbox-group" style="margin-left: 15px; border-left: 1px solid #444; padding-left: 10px;">
+                <div class="checkbox-group" style="margin-left: 10px; border-left: 1px solid #444; padding-left: 10px;">
                     <input type="checkbox" id="workspace-mode">
-                    <label for="workspace-mode" title="勾选后，VS Code 将打开整个目录并在其中定位文件">在目录打开</label>
+                    <label for="workspace-mode">在目录打开</label>
+                </div>
+
+                <!-- 切换高级选项的按钮 -->
+                <button id="toggle-advanced" class="secondary-btn" style="margin-left: auto;">⚙️ 高级</button>
+            </div>
+
+            <!-- 高级选项区域 (默认隐藏) -->
+            <div id="advanced-area" class="advanced-area">
+                <div class="row" style="margin-bottom: 0; margin-top: 10px;">
+                    <div class="input-group" style="width: 100%;">
+                        <label style="white-space: nowrap;">自定义参数:</label>
+                        <input type="text" id="extra-args" placeholder="如: -C 3 --no-ignore --max-depth 2" style="width: 100%;">
+                    </div>
                 </div>
             </div>
         </div>

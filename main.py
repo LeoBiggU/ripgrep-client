@@ -5,6 +5,7 @@ import os
 import tkinter as tk
 from tkinter import filedialog
 import html
+import shlex  # <--- 新增：用于解析命令行字符串
 
 eel.init('web')
 
@@ -19,30 +20,18 @@ def select_folder():
 
 @eel.expose
 def open_in_vscode(file_path, line_num, root_path=None):
-    """
-    调用 VS Code 打开指定文件
-    root_path: 如果提供，会先打开该目录作为工作区，再定位文件
-    """
     try:
-        # 构建命令列表
         cmd = ["code"]
-        
-        # 如果需要在目录上下文中打开
         if root_path:
             cmd.append(root_path)
-            
-        # 定位文件和行号
-        # 注意：当同时打开文件夹和文件时，VS Code 支持这种写法： code folder_path -g file_path:line
         cmd.append("-g")
         cmd.append(f"{file_path}:{line_num}")
         
-        # 隐藏控制台窗口 (Windows)
         startupinfo = None
         if os.name == 'nt':
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             
-        # shell=True 在某些环境下能更好地找到 code 命令
         subprocess.Popen(cmd, startupinfo=startupinfo, shell=True)
         return True
     except Exception as e:
@@ -79,8 +68,9 @@ def highlight_text(text, submatches):
 
     return "".join(result_parts)
 
+# --- 修改：新增 extra_args 参数 ---
 @eel.expose
-def run_ripgrep(query, path, extensions, case_sensitive):
+def run_ripgrep(query, path, extensions, case_sensitive, extra_args):
     if not query or not path:
         return {"error": "请提供搜索内容和路径"}
     
@@ -90,6 +80,7 @@ def run_ripgrep(query, path, extensions, case_sensitive):
     if not os.path.exists(rg_path):
         return {"error": f"找不到 rg.exe，请将其放在: {base_dir}"}
         
+    # 基础命令
     command = [rg_path, query, path, "--json"]
     
     if not case_sensitive:
@@ -101,6 +92,15 @@ def run_ripgrep(query, path, extensions, case_sensitive):
             if ext:
                 command.append("-g")
                 command.append(f"*.{ext}")
+
+    # --- 处理自定义参数 ---
+    if extra_args:
+        try:
+            # shlex.split 能够正确处理带引号的参数，例如：--type-add "web:*.html"
+            args_list = shlex.split(extra_args)
+            command.extend(args_list)
+        except Exception as e:
+            return {"error": f"自定义参数解析失败: {str(e)}"}
 
     try:
         startupinfo = None
@@ -154,6 +154,6 @@ def run_ripgrep(query, path, extensions, case_sensitive):
         return {"error": str(e)}
 
 try:
-    eel.start('index.html', mode='edge', size=(1000, 800))
+    eel.start('index.html', mode='edge', size=(1000, 850)) # 稍微调高一点高度
 except EnvironmentError:
     eel.start('index.html', mode='default')
