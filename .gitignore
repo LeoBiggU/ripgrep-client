@@ -1,0 +1,7 @@
+# PyInstaller打包产物
+build/
+dist/
+
+
+# Python缓存文件
+__pycache__/
