@@ -14,21 +14,22 @@
             <div class="sidebar-panel">
                 <div class="sidebar-header">
                     <span class="sidebar-title">资源管理器</span>
-                    <!-- 增加清除选择按钮 -->
+                    <!-- 清除选择按钮 -->
                     <button id="clear-tree-btn" class="icon-btn" title="清除所有选择">↺</button>
                 </div>
+                <!-- 树容器 -->
                 <div id="file-tree" class="tree-container">
                     <div class="empty-state" style="margin-top:20px; font-size:0.9em;">未选择目录</div>
                 </div>
             </div>
         </div>
 
-        <!-- 拖拽调整宽度的把手 -->
+        <!-- 拖拽把手 -->
         <div id="resizer"></div>
 
         <!-- 右侧：主要内容 -->
         <div class="main-content">
-            <!-- 顶部搜索栏 -->
+            <!-- 顶部搜索控制面板 -->
             <div class="search-panel">
                 <div class="row">
                     <input type="text" id="query" placeholder="输入搜索内容..." class="main-input">
@@ -36,30 +37,33 @@
                 </div>
                 
                 <div class="row config-row">
+                    <!-- 目录输入框 -->
                     <div class="input-group">
                         <label>目录:</label>
-                        <input type="text" id="path-input" placeholder="选择目录..." readonly style="width: 200px;">
+                        <input type="text" id="path-input" placeholder="选择目录..." readonly>
                         <button id="browse-btn" class="secondary-btn">📂</button>
                     </div>
                     
+                    <!-- 类型输入框 -->
                     <div class="input-group">
                         <label>类型:</label>
-                        <input type="text" id="extensions" placeholder="py,js" style="width: 50px;">
+                        <input type="text" id="extensions" placeholder="py,js">
                     </div>
 
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="case-sensitive">
-                        <label for="case-sensitive">Aa</label>
-                    </div>
-
-                    <div class="checkbox-group" style="margin-left: 10px; border-left: 1px solid #444; padding-left: 10px;">
+                    <!-- VSCode 联动选项 -->
+                    <div class="checkbox-group" style="border-left: 1px solid #444; padding-left: 10px;">
                         <input type="checkbox" id="workspace-mode">
                         <label for="workspace-mode">在目录打开</label>
                     </div>
 
-                    <button id="toggle-advanced" class="secondary-btn" style="margin-left: auto;">⚙️</button>
+                    <!-- 右侧功能按钮 -->
+                    <div class="action-btns">
+                        <button id="preview-cmd-btn" class="secondary-btn" title="预览命令" style="font-family: monospace; font-weight: bold;">&gt;_</button>
+                        <button id="toggle-advanced" class="secondary-btn" title="高级选项">⚙️</button>
+                    </div>
                 </div>
 
+                <!-- 高级参数区域 -->
                 <div id="advanced-area" class="advanced-area">
                     <div class="row" style="margin-bottom: 0; margin-top: 10px;">
                         <div class="input-group" style="width: 100%;">
@@ -70,10 +74,10 @@
                 </div>
             </div>
 
-            <!-- 状态栏 (挪到这里显示比较好，紧凑) -->
+            <!-- 状态栏 -->
             <div class="status-bar">
                 <span id="status-bar-text">准备就绪</span>
-                <span class="hint-text" style="font-size:0.8em">💡 左键联动树 | 右键 VSCode</span>
+                <span class="hint-text" style="font-size:0.8em">💡 智能大小写(默认) | 左键联动树 | 右键 VSCode</span>
             </div>
 
             <!-- 结果展示区 -->
@@ -83,6 +87,23 @@
         </div>
     </div>
 
+    <!-- 命令预览模态框 -->
+    <div id="cmd-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>命令预览</span>
+                <button class="close-modal-btn" id="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="cmd-preview-content" class="cmd-preview-box"></div>
+                <div style="margin-top:10px; text-align: right; color: #666; font-size: 0.85em;">
+                    * 仅用于展示参数结构，内部执行时会附加 --json 等控制符
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 必须引入 eel.js -->
     <script type="text/javascript" src="/eel.js"></script>
     <script src="script.js"></script>
 </body>
