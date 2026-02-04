@@ -1,16 +1,21 @@
+# 项目介绍
+这是一个基于 ripgrep 命令实现的文本检索UI客户端工具，用于在指定目录下检索文本内容并展示匹配行。
+
+
 # 前置要求：
 1. 本地有安装 python 环境
 2. 本地有 chrome 或 edge 浏览器 
-3. 本地有安装 ripgrep （可能不行）
+> - 本项目依赖的 ripgrep 使用项目自带的 rg.exe, 需要在windows系统使用
+> - 若希望使用通过vscode打开对应匹配行文件，请保证有安装vscode，且 `code` 命令已配置在环境变量中  
+
 
 # 启动项目
-
-切换到项目根目录后打开命令行执行命令
-下载依赖的包
+1.切换到项目根目录后打开命令行执行命令
+2.下载依赖的包
 ```bash
 pip install -r requirements.txt
 ```
-
+3.启动项目
 ```bash
 python main.py
 ```
